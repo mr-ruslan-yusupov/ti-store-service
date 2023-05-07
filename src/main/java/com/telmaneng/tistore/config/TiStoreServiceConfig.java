@@ -29,8 +29,12 @@ public class TiStoreServiceConfig {
         return http.build();
     }
 
+    /************************************************************************
+     *                      TI Client Registration                          *
+     ************************************************************************/
+
     @Bean
-    ReactiveClientRegistrationRepository clientRegistrations(
+    ReactiveClientRegistrationRepository tiClientRegistration(
             @Value("${spring.security.oauth2.client.provider.ti-webclient.token-uri}") String token_uri,
             @Value("${spring.security.oauth2.client.registration.ti-webclient.client-id}") String client_id,
             @Value("${spring.security.oauth2.client.registration.ti-webclient.client-secret}") String client_secret,
@@ -50,9 +54,9 @@ public class TiStoreServiceConfig {
     }
 
     @Bean
-    WebClient tiWebClient(ReactiveClientRegistrationRepository clientRegistrations) {
-        InMemoryReactiveOAuth2AuthorizedClientService clientService = new InMemoryReactiveOAuth2AuthorizedClientService(clientRegistrations);
-        AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistrations, clientService);
+    WebClient tiWebClient(ReactiveClientRegistrationRepository tiClientRegistration) {
+        InMemoryReactiveOAuth2AuthorizedClientService tiClientService = new InMemoryReactiveOAuth2AuthorizedClientService(tiClientRegistration);
+        AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(tiClientRegistration, tiClientService);
         ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
         oauth.setDefaultClientRegistrationId("ti-webclient");
         return WebClient.builder()

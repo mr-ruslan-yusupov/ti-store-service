@@ -24,8 +24,11 @@ public class TiStoreInventoryPricingImpl {
 
     private final WebClient tiWebClient;
 
-    public TiStoreInventoryPricingImpl(WebClient tiWebClient) {
+    private final MailjetImpl mailjetService;
+
+    public TiStoreInventoryPricingImpl(WebClient tiWebClient, MailjetImpl mailjetService) {
         this.tiWebClient = tiWebClient;
+        this.mailjetService = mailjetService;
     }
 
     public String getStoreProductByPartNumber(String tiPartNumber) {
