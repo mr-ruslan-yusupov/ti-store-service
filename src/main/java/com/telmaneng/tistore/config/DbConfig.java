@@ -26,6 +26,16 @@ public class DbConfig {
     @Value("${spring.datasource.password}")
     private String password;
 
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String hibernateHbm2ddlAuto;
+
+    @Value("${spring.jpa.database-platform}")
+    private String hibernateDialect;
+
+    @Value("${spring.jpa.show-sql}")
+    private String hibernateShowSql;
+
+
     @Bean
     public DataSource dataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -48,9 +58,9 @@ public class DbConfig {
 
     final Properties additionalProperties() {
         final Properties hibernateProperties = new Properties();
-        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "update");
-        hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.community.dialect.SQLiteDialect");
-        hibernateProperties.setProperty("hibernate.show_sql", "true");
+        hibernateProperties.setProperty("hibernate.hbm2ddl.auto", hibernateHbm2ddlAuto);
+        hibernateProperties.setProperty("hibernate.dialect", hibernateDialect);
+        hibernateProperties.setProperty("hibernate.show_sql", hibernateShowSql);
         return hibernateProperties;
     }
 }
