@@ -67,7 +67,8 @@ public class TiStoreInventoryPricingImpl {
                     String buyNowUrl = productJsonNode.get("buyNowUrl").asText();
 
                     MailjetEmailMessage message = mailjetService.createEmailMessage(tiPartNumber,description,productQuantity,buyNowUrl);
-                    mailjetService.sendEmail(message);
+                    String response = mailjetService.sendEmail(message);
+                    logger.info("TiStore app - Sending email response: {}", response);
                 }
             }
             catch (JsonProcessingException e) {

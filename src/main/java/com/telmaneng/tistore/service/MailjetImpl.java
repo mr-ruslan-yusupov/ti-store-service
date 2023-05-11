@@ -51,14 +51,15 @@ public class MailjetImpl {
         return mailjetEmailMessage;
     }
 
-    public void sendEmail(MailjetEmailMessage mailjetEmailMessage) {
+    public String sendEmail(MailjetEmailMessage mailjetEmailMessage) {
+        String response;
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonRequest = mapper.writeValueAsString(mailjetEmailMessage);
             logger.info("TiStore app - Sending email. JSON: {}", jsonRequest);
 
             //TODO - call Mailjet API
-            mailjetWebClient
+            response = mailjetWebClient
                     .post()
                     .uri("/send")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -69,8 +70,9 @@ public class MailjetImpl {
                     .block(Duration.ofSeconds(90));
         }
         catch (JsonProcessingException e) {
-            // catch various errors
             e.printStackTrace();
+            response = e.getMessage();
         }
+        return response;
     }
 }
