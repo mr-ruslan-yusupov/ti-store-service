@@ -3,8 +3,8 @@ package com.telmaneng.tistore.pojo;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ti_part_request_tbl")
-public class TiPartRequest {
+@Table(name = "ti_part_order_tbl")
+public class TiPartOrder {
 
     @Id
     @GeneratedValue
@@ -19,8 +19,6 @@ public class TiPartRequest {
     private String tiPartNumber;
     @Column(nullable = false)
     private boolean isInStock;
-    @Column(nullable = false)
-    private boolean isNotified;
 
     public int getId() {
         return id;
@@ -70,11 +68,4 @@ public class TiPartRequest {
         this.isInStock = isInStock;
     }
 
-    public boolean isNotified() {
-        return isNotified;
-    }
-
-    public void setIsNotified(boolean isNotified) {
-        this.isNotified = isNotified;
-    }
 }

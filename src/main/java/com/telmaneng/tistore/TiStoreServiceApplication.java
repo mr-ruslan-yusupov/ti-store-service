@@ -1,6 +1,6 @@
 package com.telmaneng.tistore;
 
-import com.telmaneng.tistore.pojo.TiPartRequest;
+import com.telmaneng.tistore.pojo.TiPartOrder;
 import com.telmaneng.tistore.service.TiStoreAppService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,22 +22,21 @@ public class TiStoreServiceApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        TiPartRequest tiPartRequest = new TiPartRequest();
-        tiPartRequest.setCustomerName("'Teeelmaaan'");
-        tiPartRequest.setCustomerEmail("'telman.yusupov@gmail.com'");
-        tiPartRequest.setTiPartNumber("'AFE7799IABJ'");
-        tiPartRequest.setCustomerPhoneNumber("'052-3764452'");
+        TiPartOrder tiPartOrder = new TiPartOrder();
+        tiPartOrder.setCustomerName("'Teeelmaaan'");
+        tiPartOrder.setCustomerEmail("'telman.yusupov@gmail.com'");
+        tiPartOrder.setTiPartNumber("'AFE7799IABJ'");
+        tiPartOrder.setCustomerPhoneNumber("'052-3764452'");
 
-        tiPartRequest = tiStoreAppService.addTiPartRequest(tiPartRequest);
+        tiPartOrder = tiStoreAppService.addTiPartRequest(tiPartOrder);
 
-        tiPartRequest = new TiPartRequest();
-        tiPartRequest.setCustomerName("'Ruslaaan !!!'");
-        tiPartRequest.setCustomerEmail("'mr.ruslan.yusupov@gmail.com'");
-        tiPartRequest.setTiPartNumber("'BFF7799IABC'");
-        tiPartRequest.setCustomerPhoneNumber("'052-5093585'");
-        tiPartRequest.setInStock(true);
-        tiPartRequest.setIsNotified(true);
+        tiPartOrder = new TiPartOrder();
+        tiPartOrder.setCustomerName("'Ruslaaan !!!'");
+        tiPartOrder.setCustomerEmail("'mr.ruslan.yusupov@gmail.com'");
+        tiPartOrder.setTiPartNumber("'BFF7799IABC'");
+        tiPartOrder.setCustomerPhoneNumber("'052-5093585'");
+        tiPartOrder.setInStock(true);
 
-        tiPartRequest = tiStoreAppService.addTiPartRequest(tiPartRequest);
+        tiPartOrder = tiStoreAppService.addTiPartRequest(tiPartOrder);
     }
 }

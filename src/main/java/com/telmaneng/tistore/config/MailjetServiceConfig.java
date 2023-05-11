@@ -17,35 +17,23 @@ public class MailjetServiceConfig {
     @Value("${mailjet.api.base.url}")
     private String mailjetApiBaseUrl;
 
+    @Value("${mailjet.api.key}")
+    private String clientId;
+
+    @Value("${mailjet.secret.key}")
+    private String clientSecret;
+
+
     /************************************************************************
      *                    Mailjet Client Registration                       *
      ************************************************************************/
 
-    @Bean
-    ReactiveClientRegistrationRepository mailjetClientRegistration(
-            @Value("${mailjet.api.key}") String client_id,
-            @Value("${mailjet.secret.key}") String client_secret,
-            @Value("${mailjet.authorization-grant-type}") String authorizationGrantType)
-    {
-        ClientRegistration registration = ClientRegistration
-                .withRegistrationId("mailjet-webclient")
-                .tokenUri("https://api.mailjet.com/v3")
-                .clientId(client_id)
-                .clientSecret(client_secret)
-                .authorizationGrantType(new AuthorizationGrantType(authorizationGrantType))
-                .build();
-        return new InMemoryReactiveClientRegistrationRepository(registration);
-    }
 
     @Bean
     WebClient mailjetWebClient(ReactiveClientRegistrationRepository mailjetClientRegistration) {
-        InMemoryReactiveOAuth2AuthorizedClientService mailjetClientService = new InMemoryReactiveOAuth2AuthorizedClientService(mailjetClientRegistration);
-        AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager = new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(mailjetClientRegistration, mailjetClientService);
-        ServerOAuth2AuthorizedClientExchangeFilterFunction oauth = new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
-        oauth.setDefaultClientRegistrationId("mailjet-webclient");
         return WebClient.builder()
                 .baseUrl(mailjetApiBaseUrl)
-                .filter(oauth)
+                .defaultHeaders(header -> header.setBasicAuth(clientId, clientSecret))
                 .build();
 
     }

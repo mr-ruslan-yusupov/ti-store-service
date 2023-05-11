@@ -3,7 +3,7 @@ package com.telmaneng.tistore.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.telmaneng.tistore.config.TiStoreServiceConfig;
+import com.telmaneng.tistore.pojo.MailjetEmailMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -61,15 +61,19 @@ public class TiStoreInventoryPricingImpl {
                 productJsonNode = mapper.readTree(jsonStr);
                 int productQuantity = productJsonNode.get("quantity").asInt();
                 if (productQuantity > 0) {
-                    logger.info("Teelmaaan !!! Product {} is available now .", tiPartNumber);
-                    logger.info("מהר לך תזמין ! לך לך, מהר, מהר. בוי, לך לך :)");
+                    logger.info("Product {} is available now .", tiPartNumber);
+
+                    String description = productJsonNode.get("description").asText();
+                    String buyNowUrl = productJsonNode.get("buyNowUrl").asText();
+
+                    MailjetEmailMessage message = mailjetService.createEmailMessage(tiPartNumber,description,productQuantity,buyNowUrl);
+                    mailjetService.sendEmail(message);
                 }
             }
             catch (JsonProcessingException e) {
                 logger.error(e.getMessage());
             }
-
-            System.out.println(jsonStr);
+//            System.out.println(jsonStr);
         }
     }
 

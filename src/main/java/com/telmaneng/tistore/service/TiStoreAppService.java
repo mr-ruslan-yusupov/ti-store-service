@@ -1,6 +1,6 @@
 package com.telmaneng.tistore.service;
 
-import com.telmaneng.tistore.pojo.TiPartRequest;
+import com.telmaneng.tistore.pojo.TiPartOrder;
 import com.telmaneng.tistore.repository.TiRequestRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +18,8 @@ public class TiStoreAppService {
         this.tiRequestRepository = tiRequestRepository;
     }
 
-    public TiPartRequest addTiPartRequest(TiPartRequest tiPartRequest) {
-        return tiRequestRepository.saveAndFlush(tiPartRequest);
+    public TiPartOrder addTiPartRequest(TiPartOrder tiPartOrder) {
+        return tiRequestRepository.saveAndFlush(tiPartOrder);
     }
 
 }
