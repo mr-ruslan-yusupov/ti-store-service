@@ -27,7 +27,7 @@ public class TiStoreInventoryPricingImpl {
     }
 
     public String getStoreProductByPartNumber(String tiPartNumber) {
-        logger.info("TiStore app - Getting product by part number " + tiPartNumber);
+        logger.info(">>> Getting from TI server product by part number " + tiPartNumber);
         return tiWebClient.get()
                 .uri("/store/products/" + tiPartNumber)
                 .retrieve()
@@ -36,7 +36,7 @@ public class TiStoreInventoryPricingImpl {
     }
 
     public String getStoreProducts(String gpn, Integer page, Integer size, String currency, Boolean excludeEvms) {
-        logger.info("TiStore app - Getting products");
+//        logger.info("TiStore app - Getting products");
 //        return tiWebClient.get()
 //                .uri("/store/products")
 //                .header("gpn", gpn)

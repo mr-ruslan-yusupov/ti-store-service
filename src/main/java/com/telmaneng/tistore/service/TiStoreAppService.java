@@ -5,75 +5,76 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.telmaneng.tistore.pojo.MailjetEmailMessage;
 import com.telmaneng.tistore.pojo.TiPartOrder;
-import com.telmaneng.tistore.repository.TiRequestRepository;
+import com.telmaneng.tistore.repository.TiOrderRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @ComponentScan("com.telmaneng.tistore.repository")
 public class TiStoreAppService {
     private final Logger logger = LoggerFactory.getLogger(TiStoreAppService.class);
 
-    private Set<String> productsToCheckSet = new HashSet<>(Arrays.asList("AFE7799IABJ", "LMZ31710RVQR"));
-
     private final TiStoreInventoryPricingImpl tiStoreInventory;
-    private final TiRequestRepository tiRequestRepository;
+    private final TiOrderRepository tiOrderRepository;
     private final MailjetImpl mailjetService;
 
-    public TiStoreAppService(TiStoreInventoryPricingImpl tiStoreInventory, TiRequestRepository tiRequestRepository, MailjetImpl mailjetService) {
+    public TiStoreAppService(TiStoreInventoryPricingImpl tiStoreInventory, TiOrderRepository tiOrderRepository, MailjetImpl mailjetService) {
         this.tiStoreInventory = tiStoreInventory;
-        this.tiRequestRepository = tiRequestRepository;
+        this.tiOrderRepository = tiOrderRepository;
         this.mailjetService = mailjetService;
     }
 
     public TiPartOrder addTiPartRequest(TiPartOrder tiPartOrder) {
-        return tiRequestRepository.saveAndFlush(tiPartOrder);
+        return tiOrderRepository.saveAndFlush(tiPartOrder);
     }
 
     @Scheduled(initialDelay = 20000, fixedRate = 150000) // 150000 milliseconds = 2.5 min
     public void checkProductAvailability() {
-        logger.info("TiStore app - Checking products availability");
-
-        Iterator<String> productsToCheckIterator = productsToCheckSet.iterator();
-
-        String tiPartNumber;
-        String jsonStr;
+        logger.info(">>> Start checking products availability");
 
         ObjectMapper mapper = new ObjectMapper();
+        String jsonStr;
         JsonNode productJsonNode;
 
-        while (productsToCheckIterator.hasNext()) {
-            tiPartNumber = productsToCheckIterator.next();
-            logger.info("TiStore app - Checking part number {} availability", tiPartNumber);
-            jsonStr = tiStoreInventory.getStoreProductByPartNumber(tiPartNumber);
+        List<String> emailsList = tiOrderRepository.getAllCustomerEmailsWithActiveOrders();
 
-            try {
-                productJsonNode = mapper.readTree(jsonStr);
-                int productQuantity = productJsonNode.get("quantity").asInt();
-                if (productQuantity > 0) {
-                    logger.info("Product {} is available now .", tiPartNumber);
+        for (String customerEmail : emailsList ) {
+            List<String> tiPartsList = tiOrderRepository.getTiPartNumbersNotInStockByCustomerEmail(customerEmail);
+            for (String tiPartNumber : tiPartsList) {
+                logger.info(">>> Checking product part number {} availability for customer email {}", tiPartNumber, customerEmail);
+                jsonStr = tiStoreInventory.getStoreProductByPartNumber(tiPartNumber);
 
-                    String description = productJsonNode.get("description").asText();
-                    String buyNowUrl = productJsonNode.get("buyNowUrl").asText();
+                try {
+                    productJsonNode = mapper.readTree(jsonStr);
+                    int productQuantity = productJsonNode.get("quantity").asInt();
+                    if (productQuantity > 0) {
+                        logger.info(">>> Product part number {} is available now .", tiPartNumber);
 
-                    MailjetEmailMessage message = mailjetService.createEmailMessage(tiPartNumber,description,productQuantity,buyNowUrl);
-                    String response = mailjetService.sendEmail(message);
-                    logger.info("TiStore app - Sending email response: {}", response);
+                        String description = productJsonNode.get("description").asText();
+                        String buyNowUrl = productJsonNode.get("buyNowUrl").asText();
+
+                        String customerName = tiOrderRepository.getCustomerNameByCustomerEmail(customerEmail);
+
+                        MailjetEmailMessage message = mailjetService.createEmailMessage(customerEmail, customerName, tiPartNumber,description,productQuantity,buyNowUrl);
+                        String response = mailjetService.sendEmail(message);
+                        logger.info(">>> Sending email to customer response: {}", response);
+                    }
+                    else {
+                        logger.info(">>> Product part number {} is not available yet.", tiPartNumber);
+                    }
+                }
+                catch (JsonProcessingException e) {
+                    logger.error(e.getMessage());
                 }
             }
-            catch (JsonProcessingException e) {
-                logger.error(e.getMessage());
-            }
-//            System.out.println(jsonStr);
         }
+
+        logger.info(">>> End checking parts availability");
     }
 
 }

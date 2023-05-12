@@ -22,7 +22,7 @@ public class MailjetImpl {
     }
 
 
-    public MailjetEmailMessage createEmailMessage(String tiPartNumber, String tiPartDescription, int tiPartQuantity, String buyTiPartUrl) {
+    public MailjetEmailMessage createEmailMessage(String customerEmail, String customerName, String tiPartNumber, String tiPartDescription, int tiPartQuantity, String buyTiPartUrl) {
         MailjetEmailMessage mailjetEmailMessage = new MailjetEmailMessage();
         mailjetEmailMessage.setFromEmail("mr.ruslan.yusupov@gmail.com");
         mailjetEmailMessage.setFromName("Ruslan");
@@ -45,8 +45,7 @@ public class MailjetImpl {
         mailjetEmailMessage.setPlainTextBody(messageBodyHtml.toString());
         mailjetEmailMessage.setHtmlTextBody(messageBodyHtml.toString());
 
-        //mailjetEmailMessage.addRecipient("telman.yusupov@gmail.com","Telman");
-        mailjetEmailMessage.addRecipient("tankist.teddy@gmail.com","Teddy");
+        mailjetEmailMessage.addRecipient(customerEmail,customerName);
 
         return mailjetEmailMessage;
     }
@@ -56,7 +55,7 @@ public class MailjetImpl {
         ObjectMapper mapper = new ObjectMapper();
         try {
             String jsonRequest = mapper.writeValueAsString(mailjetEmailMessage);
-            logger.info("TiStore app - Sending email. JSON: {}", jsonRequest);
+            logger.info(">>> Sending email to customer in JSON format below: \n{}", jsonRequest);
 
             //TODO - call Mailjet API
             response = mailjetWebClient
