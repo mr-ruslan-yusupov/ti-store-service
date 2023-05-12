@@ -11,11 +11,10 @@ import java.util.Optional;
 
 @Repository
 public interface TiOrderRepository extends JpaRepository<TiPartOrder, Integer> {
+
     @Query(value = "select distinct tiPartOrderTbl.customerEmail from ti_part_order_tbl tiPartOrderTbl where tiPartOrderTbl.isInStock = 0", nativeQuery = true)
     List<String> getAllCustomerEmailsWithActiveOrders();
 
-    @Query(value = "select tiPartOrderTbl.tiPartNumber from ti_part_order_tbl tiPartOrderTbl where tiPartOrderTbl.customerEmail = :customerEmail and tiPartOrderTbl.isInStock = 0", nativeQuery = true)
-    List<String> getTiPartNumbersNotInStockByCustomerEmail(@Param("customerEmail") String customerEmail);
-    @Query(value = "select distinct tiPartOrderTbl.customerName from ti_part_order_tbl tiPartOrderTbl where tiPartOrderTbl.customerEmail = :customerEmail", nativeQuery = true)
-    String getCustomerNameByCustomerEmail(String customerEmail);
+    List<TiPartOrder> findByCustomerEmailAndIsInStockFalse(String customerEmail);
+
 }

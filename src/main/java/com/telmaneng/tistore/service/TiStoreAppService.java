@@ -44,28 +44,37 @@ public class TiStoreAppService {
         List<String> emailsList = tiOrderRepository.getAllCustomerEmailsWithActiveOrders();
 
         for (String customerEmail : emailsList ) {
-            List<String> tiPartsList = tiOrderRepository.getTiPartNumbersNotInStockByCustomerEmail(customerEmail);
-            for (String tiPartNumber : tiPartsList) {
-                logger.info(">>> Checking product part number {} availability for customer email {}", tiPartNumber, customerEmail);
-                jsonStr = tiStoreInventory.getStoreProductByPartNumber(tiPartNumber);
+            List<TiPartOrder> tiPartOrderList = tiOrderRepository.findByCustomerEmailAndIsInStockFalse(customerEmail);
+
+            for (TiPartOrder tiPartOrder : tiPartOrderList) {
+                logger.info(">>> Checking product part number {} availability for customer email {}", tiPartOrder.getTiPartNumber(), customerEmail);
+                jsonStr = tiStoreInventory.getStoreProductByPartNumber(tiPartOrder.getTiPartNumber());
 
                 try {
                     productJsonNode = mapper.readTree(jsonStr);
                     int productQuantity = productJsonNode.get("quantity").asInt();
                     if (productQuantity > 0) {
-                        logger.info(">>> Product part number {} is available now .", tiPartNumber);
+                        logger.info(">>> Product part number {} is available now .", tiPartOrder.getTiPartNumber());
+
+                        tiPartOrder.setInStock(true);
+                        tiOrderRepository.saveAndFlush(tiPartOrder);
 
                         String description = productJsonNode.get("description").asText();
                         String buyNowUrl = productJsonNode.get("buyNowUrl").asText();
 
-                        String customerName = tiOrderRepository.getCustomerNameByCustomerEmail(customerEmail);
+                        MailjetEmailMessage message = mailjetService.createEmailMessage(
+                                tiPartOrder.getCustomerEmail(),
+                                tiPartOrder.getCustomerName(),
+                                tiPartOrder.getTiPartNumber(),
+                                description,
+                                productQuantity,
+                                buyNowUrl);
 
-                        MailjetEmailMessage message = mailjetService.createEmailMessage(customerEmail, customerName, tiPartNumber,description,productQuantity,buyNowUrl);
                         String response = mailjetService.sendEmail(message);
                         logger.info(">>> Sending email to customer response: {}", response);
                     }
                     else {
-                        logger.info(">>> Product part number {} is not available yet.", tiPartNumber);
+                        logger.info(">>> Product part number {} is not available yet.", tiPartOrder.getTiPartNumber());
                     }
                 }
                 catch (JsonProcessingException e) {
