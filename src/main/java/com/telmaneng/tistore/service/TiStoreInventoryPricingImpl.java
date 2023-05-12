@@ -20,15 +20,10 @@ import java.util.Set;
 public class TiStoreInventoryPricingImpl {
     private final Logger logger = LoggerFactory.getLogger(TiStoreInventoryPricingImpl.class);
 
-    private Set<String> productsToCheckSet = new HashSet<>(Arrays.asList("AFE7799IABJ", "LMZ31710RVQR"));
-
     private final WebClient tiWebClient;
 
-    private final MailjetImpl mailjetService;
-
-    public TiStoreInventoryPricingImpl(WebClient tiWebClient, MailjetImpl mailjetService) {
+    public TiStoreInventoryPricingImpl(WebClient tiWebClient) {
         this.tiWebClient = tiWebClient;
-        this.mailjetService = mailjetService;
     }
 
     public String getStoreProductByPartNumber(String tiPartNumber) {
@@ -38,44 +33,6 @@ public class TiStoreInventoryPricingImpl {
                 .retrieve()
                 .bodyToMono(String.class)
                 .block(Duration.ofSeconds(90));
-    }
-
-    @Scheduled(initialDelay = 20000, fixedRate = 150000) // 150000 milliseconds = 2.5 min
-    public void checkProductAvailability() {
-        logger.info("TiStore app - Checking products availability");
-
-        Iterator<String> productsToCheckIterator = productsToCheckSet.iterator();
-
-        String tiPartNumber;
-        String jsonStr;
-
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode productJsonNode;
-
-        while (productsToCheckIterator.hasNext()) {
-            tiPartNumber = productsToCheckIterator.next();
-            logger.info("TiStore app - Checking part number {} availability", tiPartNumber);
-            jsonStr = getStoreProductByPartNumber(tiPartNumber);
-
-            try {
-                productJsonNode = mapper.readTree(jsonStr);
-                int productQuantity = productJsonNode.get("quantity").asInt();
-                if (productQuantity > 0) {
-                    logger.info("Product {} is available now .", tiPartNumber);
-
-                    String description = productJsonNode.get("description").asText();
-                    String buyNowUrl = productJsonNode.get("buyNowUrl").asText();
-
-                    MailjetEmailMessage message = mailjetService.createEmailMessage(tiPartNumber,description,productQuantity,buyNowUrl);
-                    String response = mailjetService.sendEmail(message);
-                    logger.info("TiStore app - Sending email response: {}", response);
-                }
-            }
-            catch (JsonProcessingException e) {
-                logger.error(e.getMessage());
-            }
-//            System.out.println(jsonStr);
-        }
     }
 
     public String getStoreProducts(String gpn, Integer page, Integer size, String currency, Boolean excludeEvms) {

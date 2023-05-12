@@ -22,21 +22,21 @@ public class TiStoreServiceApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        TiPartOrder tiPartOrder = new TiPartOrder();
-        tiPartOrder.setCustomerName("'Teeelmaaan'");
-        tiPartOrder.setCustomerEmail("'telman.yusupov@gmail.com'");
-        tiPartOrder.setTiPartNumber("'AFE7799IABJ'");
-        tiPartOrder.setCustomerPhoneNumber("'052-3764452'");
-
-        tiPartOrder = tiStoreAppService.addTiPartRequest(tiPartOrder);
-
-        tiPartOrder = new TiPartOrder();
-        tiPartOrder.setCustomerName("'Ruslaaan !!!'");
-        tiPartOrder.setCustomerEmail("'mr.ruslan.yusupov@gmail.com'");
-        tiPartOrder.setTiPartNumber("'BFF7799IABC'");
-        tiPartOrder.setCustomerPhoneNumber("'052-5093585'");
-        tiPartOrder.setInStock(true);
-
-        tiPartOrder = tiStoreAppService.addTiPartRequest(tiPartOrder);
+//        TiPartOrder tiPartOrder = new TiPartOrder();
+//        tiPartOrder.setCustomerName("'Teeelmaaan'");
+//        tiPartOrder.setCustomerEmail("'telman.yusupov@gmail.com'");
+//        tiPartOrder.setTiPartNumber("'AFE7799IABJ'");
+//        tiPartOrder.setCustomerPhoneNumber("'052-3764452'");
+//
+//        tiPartOrder = tiStoreAppService.addTiPartRequest(tiPartOrder);
+//
+//        tiPartOrder = new TiPartOrder();
+//        tiPartOrder.setCustomerName("'Ruslaaan !!!'");
+//        tiPartOrder.setCustomerEmail("'mr.ruslan.yusupov@gmail.com'");
+//        tiPartOrder.setTiPartNumber("'BFF7799IABC'");
+//        tiPartOrder.setCustomerPhoneNumber("'052-5093585'");
+//        tiPartOrder.setInStock(true);
+//
+//        tiPartOrder = tiStoreAppService.addTiPartRequest(tiPartOrder);
     }
 }

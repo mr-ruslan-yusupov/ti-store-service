@@ -64,7 +64,8 @@ public class MailjetImpl {
                     .uri("/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .body(Mono.just(jsonRequest), String.class)
+                    .bodyValue(jsonRequest)
+                    //.body(Mono.just(jsonRequest), String.class) <-- alternative way
                     .retrieve()
                     .bodyToMono(String.class)
                     .block(Duration.ofSeconds(90));
